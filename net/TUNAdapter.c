@@ -85,6 +85,10 @@ static Iface_DEFUN incomingFromTunIf(struct Message* msg, struct Iface* tunIf)
         return Iface_next(tunIf, msg);
     }
 
+    //TODO(cjd): Overflow 89 net/TUNAdapter.c:89:5: warning: 'memmove' will always overflow;
+    //   destination buffer has size 0, but size argument is 16 [-Wfortify-source]
+    //   __builtin_memmove(header->destinationAddr - 4,header->destinationAddr,16); ^
+
     // first move the dest addr to the right place.
     Bits_memmove(header->destinationAddr - DataHeader_SIZE, header->destinationAddr, 16);
 
@@ -128,6 +132,10 @@ static Iface_DEFUN incomingFromUpperDistributorIf(struct Message* msg,
     struct DataHeader* dh = (struct DataHeader*) &hdr[1];
     enum ContentType type = DataHeader_getContentType(dh);
     Assert_true(type <= ContentType_IP6_MAX);
+
+    // TODO(cjd): Overflow 133 net/TUNAdapter.c:133:5: warning: 'memmove' will always overflow;
+    //    destination buffer has size 0, but size argument is 16 [-Wfortify-source]
+    //    __builtin_memmove(hdr->ip6 + 4 - 16,hdr->ip6,16); ^
 
     // Shift ip address into destination slot.
     Bits_memmove(hdr->ip6 + DataHeader_SIZE - 16, hdr->ip6, 16);
