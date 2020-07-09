@@ -42,8 +42,6 @@ int main(int argc, char** argv)
   #endif
 #endif
 
-    printf("argc: %d, argv: %s\n", argc, argv[0]);
-
     bool runOnce = false;
     if (argc > 1) {
         if (strcmp(argv[1],"--runonce")==0) {
