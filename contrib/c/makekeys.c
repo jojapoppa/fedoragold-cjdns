@@ -56,7 +56,10 @@ int main(int argc, char** argv)
         Hex_encode(hexPrivateKey, 65, privateKey, 32);
         Base32_encode(publicKeyBase32, 53, publicKey, 32);
         AddrTools_printIp(printedIp, ip);
-        printf("%s %s %s.k\n", hexPrivateKey, printedIp, publicKeyBase32);
+        //printf("%s %s %s.k\n", hexPrivateKey, printedIp, publicKeyBase32);
+        printf("privateKey: %s\n", hexPrivateKey);
+        printf("ipv6: %s\n", printedIp);
+        printf("publicKey: %s.k\n", publicKeyBase32);
         fflush(stdout);
     } while (!runOnce);
 
