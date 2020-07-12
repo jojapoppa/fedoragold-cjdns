@@ -412,13 +412,20 @@ int Core_main(int argc, char** argv)
     Allocator_setCanary(alloc, (unsigned long)Random_uint64(rand));
 
     struct Allocator* tempAlloc = Allocator_child(alloc);
-    struct Pipe* clientPipe = Pipe_named(argv[2], argv[3], eventBase, eh, tempAlloc);
+
+    // Not using tempalloc because we're going to keep this pipe around for admin
+    struct Pipe* clientPipe = Pipe_named(argv[2], argv[3], eventBase, eh, alloc);
+
     clientPipe->logger = logger;
+    Log_debug(logger, "Created pipe path: %s, name: %s", argv[2], argv[3]);
     Log_debug(logger, "Getting pre-configuration from client");
     struct Message* preConf =
         InterfaceWaiter_waitForData(&clientPipe->iface, eventBase, tempAlloc, eh);
     Log_debug(logger, "Finished getting pre-configuration from client");
-    Dict* config = BencMessageReader_read(preConf, tempAlloc, eh);
+    Log_debug(logger, "Pre-conf message length: %d", preConf->length);
+
+    // Not using tempalloc because we're going to keep this config data around for admin
+    Dict* config = BencMessageReader_read(preConf, alloc, eh);
 
     String* privateKeyHex = Dict_getStringC(config, "privateKey");
     Dict* adminConf = Dict_getDictC(config, "admin");
@@ -438,10 +445,15 @@ int Core_main(int argc, char** argv)
     }
     Log_keys(logger, "Starting core with admin password [%s]", pass->bytes);
     uint8_t privateKey[32];
-    if (privateKeyHex->len != 64
-        || Hex_decode(privateKey, 32, (uint8_t*) privateKeyHex->bytes, 64) != 32)
+    if (privateKeyHex->len != 64)
     {
-        Except_throw(eh, "privateKey must be 64 bytes of hex.");
+        Except_throw(eh, "privateKey must be 64 bytes of hex: %d : [%s]",
+            privateKeyHex->len, privateKeyHex->bytes);
+    }
+
+    int privateKeyBytesSize = (int)Hex_decode(privateKey, 32, (uint8_t*) privateKeyHex->bytes, 64);
+    if (privateKeyBytesSize != 32) {
+        Except_throw(eh, "privateKey Hex_decode not 32: %d", privateKeyBytesSize);
     }
 
     struct Sockaddr_storage bindAddr;
