@@ -34,6 +34,7 @@
 #include "util/events/Timeout.h"
 #include "util/Defined.h"
 #include "util/Escape.h"
+#include "util/Assert.h"
 #include "wire/Error.h"
 #include "wire/Headers.h"
 #include "wire/Ethernet.h"
@@ -738,6 +739,38 @@ static Iface_DEFUN incomingFromTun(struct Message* message, struct Iface* tunIf)
     }
 
     return sendToNode(message, conn, context);
+}
+
+int IpTunnel_adminSendToNode(String* messageData,
+                             struct IpTunnel_Connection* connection,
+                             struct IpTunnel* tunnel,
+                             struct Allocator* requestAlloc)
+{
+    struct Message* message = Message_new(0, messageData->len+1, requestAlloc);
+    Message_push(message, messageData->bytes, messageData->len, NULL);
+    struct IpTunnel_pvt* context = Identity_check((struct IpTunnel_pvt*)tunnel);
+    struct Iface* face = sendToNode(message, connection, context);
+    Assert_ifParanoid(face);
+    return 0;
+}
+
+int IpTunnel_adminGetFromNode(String* msg, struct Allocator* allocator)
+{
+    struct Message* message = NULL;
+
+/* TODO(jojapoppa) check pop */
+/* is there some way of examining the TUN stack first, and only pop the */
+/* message if it is intended for the admin interface?  either that or can */
+/* we leave the message on the TUN stack without removing it?  this way */
+/* the TUN device can still work properly in parallel */
+
+/* also... verify that pop allocates Message */
+
+    uint16_t ethertype = TUNMessageType_pop(message, NULL);
+    msg = String_newBinary(NULL, message->length+1, allocator);
+    Bits_memcpy(msg->bytes, message->bytes, message->length);
+
+    return ethertype;
 }
 
 static Iface_DEFUN ip6FromNode(struct Message* message,

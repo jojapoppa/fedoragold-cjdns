@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 var Cjdns = require('./lib/cjdnsadmin/cjdnsadmin');
-var nThen = require('nthen');
+var nThen = require('../node_modules/nthen');
 
 Cjdns.connectWithAdminInfo(function (cjdns) {
 

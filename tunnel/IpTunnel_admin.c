@@ -221,6 +221,45 @@ static void showConnection(Dict* args, void* vcontext, String* txid, struct Allo
     sendError("connection not found", txid, context->admin);
 }
 
+static void sendDataToConnection(Dict* args, void* vcontext, String* txid, struct Allocator* alloc)
+{
+    struct Context* context = vcontext;
+    int connNum = (int) *(Dict_getIntC(args, "connection"));
+
+    String* messageData=
+        Dict_getStringC(args, "message");
+
+    for (int i = 0; i < (int)context->ipTun->connectionList.count; i++) {
+        if (connNum == context->ipTun->connectionList.connections[i].number) {
+            IpTunnel_adminSendToNode(messageData, &context->ipTun->connectionList.connections[i],
+              context->ipTun, alloc);
+            sendResponse(connNum, txid, context->admin);
+            return;
+        }
+    }
+    sendError("connection not found", txid, context->admin);
+}
+
+static void getDataFromConnection(Dict* args, void* vcontext, String* txid, struct Allocator* alloc)
+{
+    struct Context* context = vcontext;
+    int connNum = (int) *(Dict_getIntC(args, "connection"));
+
+    //struct IpTunnel_pvt* ctx = Identity_check((struct IpTunnel_pvt*) context->ipTun);
+    for (int i = 0; i < (int)context->ipTun->connectionList.count; i++) {
+        if (connNum == context->ipTun->connectionList.connections[i].number) {
+            String* amsg = NULL; /* allocated inside of IpTunnel_adminGetFromNode */
+            IpTunnel_adminGetFromNode(amsg, alloc);
+
+            Dict resp = Dict_CONST(String_CONST("data"), String_OBJ(amsg), NULL);
+            Admin_sendMessage(&resp, txid, context->admin);
+            return;
+        }
+    }
+
+    sendError("connection not found", txid, context->admin);
+}
+
 void IpTunnel_admin_register(struct IpTunnel* ipTun, struct Admin* admin, struct Allocator* alloc)
 {
     struct Context* context = Allocator_clone(alloc, (&(struct Context) {
@@ -250,6 +289,17 @@ void IpTunnel_admin_register(struct IpTunnel* ipTun, struct Admin* admin, struct
         }), admin);
 
     Admin_registerFunction("IpTunnel_showConnection", showConnection, context, true,
+        ((struct Admin_FunctionArg[]) {
+            { .name = "connection", .required = 1, .type = "Int" }
+        }), admin);
+
+    Admin_registerFunction("IpTunnel_sendDataToConnection", sendDataToConnection, context, true,
+        ((struct Admin_FunctionArg[]) {
+            { .name = "connection", .required = 1, .type = "Int" },
+            { .name = "message", .required = 0, .type = "String" }
+        }), admin);
+
+    Admin_registerFunction("IpTunnel_getDataFromConnection", getDataFromConnection, context, true,
         ((struct Admin_FunctionArg[]) {
             { .name = "connection", .required = 1, .type = "Int" }
         }), admin);

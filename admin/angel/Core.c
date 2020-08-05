@@ -447,7 +447,7 @@ int Core_main(int argc, char** argv)
     uint8_t privateKey[32];
     if (privateKeyHex->len != 64)
     {
-        Except_throw(eh, "privateKey must be 64 bytes of hex: %d : [%s]",
+        Except_throw(eh, "privateKey must be 64 bytes of hex: %ld : [%s]",
             privateKeyHex->len, privateKeyHex->bytes);
     }
 

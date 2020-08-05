@@ -134,4 +134,13 @@ int IpTunnel_connectTo(uint8_t publicKeyOfNodeToConnectTo[32], struct IpTunnel* 
 #define IpTunnel_removeConnection_NOT_FOUND -1
 int IpTunnel_removeConnection(int connectionNumber, struct IpTunnel* tunnel);
 
+/**
+ * Used to send/recieve data with Connections.
+ */
+int IpTunnel_adminGetFromNode(String* msg,
+                                       struct Allocator* allocator);
+int IpTunnel_adminSendToNode(String* messageData,
+                                       struct IpTunnel_Connection* connection,
+                                       struct IpTunnel* tunnel,
+                                       struct Allocator* requestAlloc);
 #endif
