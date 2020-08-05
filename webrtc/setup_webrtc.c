@@ -65,7 +65,7 @@ void HandleBrowserRequest(DataSocket* ds, bool* quit) {
   }
 }
 
-int main(int argc, char* argv[]) {
+int setup_webrtc(int argc, char* argv[]) {
   absl::SetProgramUsageMessage(
       "Example usage: ./peerconnection_server --port=8888\n");
   absl::ParseCommandLine(argc, argv);
