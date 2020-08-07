@@ -40,10 +40,6 @@
 #include "wire/Ethernet.h"
 #include "wire/DataHeader.h"
 
-#include "webrtc/peer_channel.h"
-
-#include <stddef.h>
-
 #if (defined(win64) || defined(win32)) && defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
