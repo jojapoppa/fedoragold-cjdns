@@ -13,6 +13,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "util/platform/Socket.h"
+#include <stdlib.h>
 
 #ifdef win32
     #include <winsock2.h>
@@ -68,6 +69,8 @@ int Socket_close(int sock)
 
 int Socket_recv(int sockfd, void* buff, unsigned long bufferSize, int flags)
 {
+    printf("Socket_recv\n");
+
     return (int) recv(sockfd, buff, bufferSize, flags);
 }
 
@@ -77,6 +80,8 @@ int Socket_recvfrom(int fd,
                     int flags,
                     struct Sockaddr_storage* ss)
 {
+    printf("Socket_recvfrom\n");
+
     SIGNED_IF_WIN32_uint32_t size = Sockaddr_MAXSIZE;
     int ret = recvfrom(fd, buff, bufferSize, flags, (struct sockaddr*)ss->nativeAddr, &size);
     if (ret > -1) {
@@ -119,6 +124,8 @@ int Socket_bind(int fd, const struct Sockaddr* sa)
 
 int Socket_send(int socket, const void *buffer, unsigned long length, int flags)
 {
+    printf("Socket_send\n");
+
     return (int) send(socket, buffer, length, flags);
 }
 
@@ -128,6 +135,8 @@ int Socket_sendto(int fd,
                   int flags,
                   const struct Sockaddr* dest)
 {
+    printf("Socket_sendto\n");
+
     return (int) sendto(fd,
                         buffer,
                         len,
