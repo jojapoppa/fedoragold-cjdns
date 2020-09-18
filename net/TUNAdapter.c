@@ -25,6 +25,7 @@
 #include "crypto/AddressCalc.h"
 #include "util/Defined.h"
 #include "util/AddrTools.h"
+#include "util/Hex.h"
 
 struct TUNAdapter_pvt
 {
@@ -38,9 +39,17 @@ static Iface_DEFUN incomingFromTunIf(struct Message* msg, struct Iface* tunIf)
 {
     struct TUNAdapter_pvt* ud = Identity_containerOf(tunIf, struct TUNAdapter_pvt, pub.tunIf);
 
+    Log_debug(ud->log, "incomingFromTunIf *****");
+
     uint16_t ethertype = TUNMessageType_pop(msg, NULL);
 
+    Log_debug(ud->log, "ethertype should be: %d", Ethernet_TYPE_IP6);
+    Log_debug(ud->log, "ethertype is: %d", ethertype);
+
     int version = Headers_getIpVersion(msg->bytes);
+
+    Log_debug(ud->log, "version is: %d", version);
+
     if ((ethertype == Ethernet_TYPE_IP4 && version != 4)
         || (ethertype == Ethernet_TYPE_IP6 && version != 6))
     {
@@ -58,12 +67,26 @@ static Iface_DEFUN incomingFromTunIf(struct Message* msg, struct Iface* tunIf)
         return NULL;
     }
 
+    Log_debug(ud->log, "header must be greater than byte len: %d", Headers_IP6Header_SIZE);
+
     if (msg->length < Headers_IP6Header_SIZE) {
         Log_debug(ud->log, "DROP runt");
         return NULL;
     }
 
     struct Headers_IP6Header* header = (struct Headers_IP6Header*) msg->bytes;
+
+    Log_debug(ud->log, "versionClass combined: %d", header->versionClassAndFlowLabel);
+    Log_debug(ud->log, "flowLabelLow_be %d", header->flowLabelLow_be);
+    Log_debug(ud->log, "payloadLength_be %d", Endian_hostToBigEndian16(header->payloadLength_be));
+    Log_debug(ud->log, "nextHeader %d", header->nextHeader);
+    Log_debug(ud->log, "hopLimit %d", header->hopLimit);
+    uint8_t pack[40];
+    AddrTools_printIp(pack, header->sourceAddr);
+    Log_debug(ud->log, "srcAddr: %s", pack);
+    AddrTools_printIp(pack, header->destinationAddr);
+    Log_debug(ud->log, "destAddr: %s", pack);
+
     if (!AddressCalc_validAddress(header->destinationAddr)) {
         return Iface_next(&ud->pub.ipTunnelIf, msg);
     }

@@ -22,6 +22,7 @@
 #include "wire/Headers.h"
 #include "wire/Message.h"
 #include "wire/Error.h"
+#include "util/Hex.h"
 
 struct SocketWrapper_pvt
 {
@@ -35,18 +36,32 @@ static Iface_DEFUN incomingFromSocket(struct Message* msg, struct Iface* externa
     struct SocketWrapper_pvt* ctx =
         Identity_containerOf(externalIf, struct SocketWrapper_pvt, pub.externalIf);
 
+Log_debug(ctx->logger, "*******************************************************");
+Log_debug(ctx->logger, "*******************************************************");
+Log_debug(ctx->logger, "*******************************************************");
+Log_debug(ctx->logger, "*******************************************************");
+Log_debug(ctx->logger, "*******************************************************");
+Log_debug(ctx->logger, "SocketWrapper: incomingFromSocket()");
+
     if (!ctx->pub.internalIf.connectedIf) {
         Log_debug(ctx->logger, "DROP message for socket not inited");
         return NULL;
     }
 
     // get ess packet type
-    uint8_t type = Message_pop8(msg, NULL);
+    uint32_t type = Message_pop32(msg, NULL);
+
     Log_debug(ctx->logger, "Packet type [%d]", type);
+    Log_debug(ctx->logger, "TUN PACKET type is: %d", SocketWrapper_TYPE_TUN_PACKET);
 
     if (type == SocketWrapper_TYPE_TUN_PACKET) {
+
+Log_debug(ctx->logger, "it's a packet! ....");
+
         // skip tun packet length
-        Message_pop32(msg, NULL);
+        uint32_t len = Message_pop32(msg, NULL);
+Log_debug(ctx->logger, "skipping len %d", len);
+
         return Iface_next(&ctx->pub.internalIf, msg);
     }
 
@@ -59,6 +74,13 @@ static Iface_DEFUN incomingFromUs(struct Message* msg, struct Iface* internalIf)
     struct SocketWrapper_pvt* ctx =
         Identity_containerOf(internalIf, struct SocketWrapper_pvt, pub.internalIf);
 
+Log_debug(ctx->logger, "*******************************************************");
+Log_debug(ctx->logger, "*******************************************************");
+Log_debug(ctx->logger, "*******************************************************");
+Log_debug(ctx->logger, "*******************************************************");
+Log_debug(ctx->logger, "*******************************************************");
+Log_debug(ctx->logger, "SocketWrapper: incomingFromUs()");
+
     if (!ctx->pub.externalIf.connectedIf) {
         Log_debug(ctx->logger, "DROP message for socket not inited");
         return NULL;
@@ -68,6 +90,8 @@ static Iface_DEFUN incomingFromUs(struct Message* msg, struct Iface* internalIf)
     Message_push32(msg, msg->length, NULL);
     // mark this as a normal tun packet
     Message_push8(msg, SocketWrapper_TYPE_TUN_PACKET, NULL);
+
+Assert_true(!((uintptr_t)msg->bytes % 4) || !"alignment fault");
 
     return Iface_next(&ctx->pub.externalIf, msg);
 }
@@ -108,6 +132,8 @@ void SocketWrapper_setMTU(struct Iface* rawSocketIf,
     struct Message* out = Message_new(0, len, alloc);
     Message_push32(out, mtu, eh);
     Message_push8(out, SocketWrapper_TYPE_CONF_SET_MTU, eh);
+
+Log_debug(logger, "setMTU in SocketWrapper");
 
     Iface_send(rawSocketIf, out);
 }

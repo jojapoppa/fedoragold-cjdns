@@ -70,6 +70,7 @@ void NetDev_setMTU(const char* interfaceName,
                    struct Log* logger,
                    struct Except* eh)
 {
+Log_info(logger, "in setMTU");
      NetPlatform_setMTU(interfaceName, mtu, logger, eh);
 }
 

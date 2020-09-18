@@ -34,6 +34,8 @@ static Iface_DEFUN receiveMessage(struct Message* msg, struct Iface* external)
 {
     struct TAPWrapper_pvt* tw = Identity_containerOf(external, struct TAPWrapper_pvt, external);
 
+Log_debug(tw->log, "in TAPWrapper.c:receiveMessage!!!!!!!!!!!!!!!!!!!!");
+
     if (msg->length < Ethernet_SIZE-2) {
         Log_debug(tw->log, "runt");
         return 0;
@@ -76,6 +78,8 @@ static Iface_DEFUN receiveMessage(struct Message* msg, struct Iface* external)
 static Iface_DEFUN sendMessage(struct Message* msg, struct Iface* internal)
 {
     struct TAPWrapper_pvt* tw = Identity_containerOf(internal, struct TAPWrapper_pvt, pub.internal);
+
+Log_debug(tw->log, "in TAPWrapper.c:sendMessage!!!!!!!!!!!!!!!!!!!!");
 
     uint16_t etherType = TUNMessageType_pop(msg, NULL);
     struct Ethernet eth = { .ethertype = etherType };

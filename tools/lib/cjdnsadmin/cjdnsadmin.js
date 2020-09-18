@@ -206,7 +206,7 @@ var connect = module.exports.connect = function (addr, port, pass, callback) {
 };
 
 var connectWithAdminInfo = module.exports.connectWithAdminInfo = function (callback) {
-    var cjdnsAdmin = {'addr': '127.0.0.1', 'port': 11234, 'password': 'yf50xldykjr49dkdghm1jm7ny0kmdkm'}; //'NONE'};
+    var cjdnsAdmin = {'addr': '127.0.0.1', 'port': 11234, 'password': 'wmnbghknmtdyjkz36tr96nkrv1r178x'}; //'NONE'};
     nThen(function (waitFor) {
         Fs.readFile(process.env.HOME + '/.cjdnsadmin', waitFor(function (err, ret) {
             if (err && err.code != 'ENOENT') { throw err; }
@@ -218,7 +218,7 @@ var connectWithAdminInfo = module.exports.connectWithAdminInfo = function (callb
 };
 
 var connectAsAnon = module.exports.connectAsAnon = function (callback, addr, port) {
-    var cjdnsAdmin = {'addr': addr || '127.0.0.1', 'port': port || 11234, 'password': 'yf50xldykjr49dkdghm1jm7ny0kmdkm'}; //'NONE'};
+    var cjdnsAdmin = {'addr': addr || '127.0.0.1', 'port': port || 11234, 'password': 'wmnbghknmtdyjkz36tr96nkrv1r178x'}; //'NONE'};
     nThen(function (waitFor) {
         Fs.readFile(process.env.HOME + '/.cjdnsadmin', waitFor(function (err, ret) {
             if (!err) { cjdnsAdmin = JSON.parse(String(ret)); }

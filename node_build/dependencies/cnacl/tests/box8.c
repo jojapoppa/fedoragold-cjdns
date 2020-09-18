@@ -3,7 +3,7 @@
 #include "crypto_box.h"
 #include "randombytes.h"
 
-#ifdef __MINGW64__
+#ifdef _WIN32
 #define random rand
 #define srandom srand
 #endif

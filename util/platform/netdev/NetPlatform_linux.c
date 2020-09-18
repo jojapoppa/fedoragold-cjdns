@@ -190,6 +190,9 @@ void NetPlatform_setMTU(const char* interfaceName,
                         struct Log* logger,
                         struct Except* eh)
 {
+
+Log_info(logger, "in linux setMTU...");
+
     struct ifreq ifRequest;
     int s = socketForIfName(interfaceName, AF_INET6, eh, &ifRequest);
 
