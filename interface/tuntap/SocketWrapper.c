@@ -89,7 +89,7 @@ Log_debug(ctx->logger, "SocketWrapper: incomingFromUs()");
     // send payload length
     Message_push32(msg, msg->length, NULL);
     // mark this as a normal tun packet
-    Message_push8(msg, SocketWrapper_TYPE_TUN_PACKET, NULL);
+    Message_push32(msg, SocketWrapper_TYPE_TUN_PACKET, NULL);
 
 Assert_true(!((uintptr_t)msg->bytes % 4) || !"alignment fault");
 
