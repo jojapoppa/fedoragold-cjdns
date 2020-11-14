@@ -379,7 +379,7 @@ static Iface_DEFUN incomingFromSwitchIf(struct Message* msg, struct Iface* iface
         }
 
         uint64_t label = Endian_bigEndianToHost64(switchHeader->label_be);
-        session = getSession(sm, ip6, caHeader->publicKey, 0, label, 0xfffff000, 1); // was 0
+        session = getSession(sm, ip6, caHeader->publicKey, 0, label, 0xfffff000, 0); // not this one
         CryptoAuth_resetIfTimeout(session->pub.caSession);
         debugHandlesAndLabel(sm->log, session, label, "new session nonce[%d]", nonceOrHandle);
     }
@@ -685,7 +685,7 @@ static Iface_DEFUN incomingFromInsideIf(struct Message* msg, struct Iface* iface
                               Endian_bigEndianToHost32(header->version_be),
                               Endian_bigEndianToHost64(header->sh.label_be),
                               0xfffffff0,
-                              !(header->flags & RouteHeader_flags_PATHFINDER));
+                              0); //!(header->flags & RouteHeader_flags_PATHFINDER));
         } else {
             needsLookup(sm, msg, false);
             return NULL;
