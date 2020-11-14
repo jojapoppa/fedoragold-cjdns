@@ -761,7 +761,7 @@ static Iface_DEFUN incomingFromEventIf(struct Message* msg, struct Iface* iface)
                       Endian_bigEndianToHost32(node.version_be),
                       Endian_bigEndianToHost64(node.path_be),
                       Endian_bigEndianToHost32(node.metric_be),
-                      0);
+                      1); // was 0
 
     // Send what's on the buffer...
     if (index > -1 && CryptoAuth_getState(sess->pub.caSession) >= CryptoAuth_State_RECEIVED_KEY) {
