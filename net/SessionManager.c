@@ -685,7 +685,7 @@ static Iface_DEFUN incomingFromInsideIf(struct Message* msg, struct Iface* iface
                               Endian_bigEndianToHost32(header->version_be),
                               Endian_bigEndianToHost64(header->sh.label_be),
                               0xfffffff0,
-                              0); //!(header->flags & RouteHeader_flags_PATHFINDER));
+                              1); //!(header->flags & RouteHeader_flags_PATHFINDER));
         } else {
             needsLookup(sm, msg, false);
             return NULL;
